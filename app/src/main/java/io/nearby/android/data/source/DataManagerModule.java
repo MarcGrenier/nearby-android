@@ -9,7 +9,7 @@ import javax.inject.Singleton;
 import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
-import io.nearby.android.data.source.local.SharedPreferencesHelper;
+import io.nearby.android.data.source.local.SharedPreferencesManager;
 import io.nearby.android.data.source.local.SpottedLocalDataSource;
 import io.nearby.android.data.source.remote.NearbyService;
 import io.nearby.android.data.source.remote.ServiceCreator;
@@ -35,7 +35,7 @@ abstract class DataManagerModule {
     @Singleton
     @Binds
     @Local
-    abstract SharedPreferencesHelper provideSharedPreferencesHelper(SharedPreferencesHelper sharedPreferencesHelper);
+    abstract SharedPreferencesManager provideSharedPreferencesHelper(SharedPreferencesManager sharedPreferencesManager);
 
     @Provides
     static GoogleApiClient provideGoogleApiClient(Context context){
@@ -46,10 +46,10 @@ abstract class DataManagerModule {
 
     @Singleton
     @Provides
-    static NearbyService provideNearbyService(SharedPreferencesHelper sharedPreferencesHelper){
+    static NearbyService provideNearbyService(SharedPreferencesManager sharedPreferencesManager){
         ServiceCreator<NearbyService> creator = new ServiceCreator<>(NearbyService.class,
                 NearbyService.ENDPOINT,
-                sharedPreferencesHelper);
+                sharedPreferencesManager);
         return creator.create();
     }
 }

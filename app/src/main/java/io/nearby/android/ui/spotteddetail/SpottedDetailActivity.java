@@ -12,9 +12,6 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
-import javax.inject.Inject;
-
-import io.nearby.android.NearbyApplication;
 import io.nearby.android.R;
 import io.nearby.android.data.Spotted;
 import io.nearby.android.ui.BaseActivity;
@@ -37,21 +34,14 @@ public class SpottedDetailActivity extends BaseActivity<SpottedDetailContract.Pr
     private View mProgressBarContainer;
     private View mErrorMessage;
 
-    @Inject
-    SpottedDetailPresenter mPresenter;
+    private SpottedDetailPresenter mPresenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //Dagger injection
-        DaggerSpottedDetailComponent.builder()
-                .spottedDetailPresenterModule(new SpottedDetailPresenterModule(this))
-                .dataManagerComponent(((NearbyApplication) getApplication())
-                        .getDataManagerComponent()).build()
-                .inject(this);
-
         setContentView(R.layout.spotted_detail_activity);
+
+        mPresenter = new SpottedDetailPresenter(this);
 
         initializeView();
 

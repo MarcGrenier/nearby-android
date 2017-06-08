@@ -15,17 +15,26 @@ import io.nearby.android.data.User;
 import io.nearby.android.data.source.local.SpottedLocalDataSource;
 import io.nearby.android.data.source.remote.SpottedRemoteDataSource;
 
-@Singleton
 public class DataManager implements SpottedDataSource{
+
+    private static DataManager instance;
 
     private final SpottedLocalDataSource mLocalDataSource;
     private final SpottedRemoteDataSource mRemoteDataSource;
 
-    @Inject
-    public DataManager(SpottedRemoteDataSource remoteDataSource,
-                       SpottedLocalDataSource localDataSource) {
-        mRemoteDataSource = remoteDataSource;
-        mLocalDataSource = localDataSource;
+
+    public static DataManager getInstance(){
+        if(instance == null){
+            instance = new DataManager();
+        }
+
+        return instance;
+    }
+
+
+    private DataManager() {
+        mRemoteDataSource = new SpottedRemoteDataSource();
+        mLocalDataSource = new SpottedLocalDataSource();
     }
 
     @Override

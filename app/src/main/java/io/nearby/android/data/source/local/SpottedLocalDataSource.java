@@ -23,31 +23,39 @@ import io.nearby.android.data.Spotted;
 import io.nearby.android.data.source.Local;
 import io.nearby.android.data.source.SpottedDataSource;
 
-@Singleton
-@Local
 public class SpottedLocalDataSource implements SpottedDataSource {
 
     private final GoogleApiClient mGoogleApiClient;
-    private SharedPreferencesHelper mSharedPreferencesHelper;
+    private SharedPreferencesManager mSharedPreferencesManager;
 
-    @Inject
-    public SpottedLocalDataSource(SharedPreferencesHelper sharedPreferencesHelper,
+    private static SpottedLocalDataSource instance;
+
+    public static SpottedLocalDataSource getInstance(){
+        if(instance == null){
+            instance = new SpottedLocalDataSource();
+        }
+
+        return instance;
+    }
+
+
+    private SpottedLocalDataSource(SharedPreferencesManager sharedPreferencesManager,
                                   GoogleApiClient googleApiClient) {
-        mSharedPreferencesHelper = sharedPreferencesHelper;
+        mSharedPreferencesManager = sharedPreferencesManager;
         mGoogleApiClient = googleApiClient;
         mGoogleApiClient.connect();
     }
 
     @Override
     public void isUserLoggedIn(UserLoginStatusCallback callback) {
-        if(mSharedPreferencesHelper.hasUserAlreadySignedIn()) {
-            int method = mSharedPreferencesHelper.getLastSignInMethod();
+        if(mSharedPreferencesManager.hasUserAlreadySignedIn()) {
+            int method = mSharedPreferencesManager.getLastSignInMethod();
 
             switch (method) {
-                case SharedPreferencesHelper.LAST_SIGN_IN_METHOD_FACEBOOK:
+                case SharedPreferencesManager.LAST_SIGN_IN_METHOD_FACEBOOK:
                     facebookAuthentification(callback);
                     break;
-                case SharedPreferencesHelper.LAST_SIGN_IN_METHOD_GOOGLE:
+                case SharedPreferencesManager.LAST_SIGN_IN_METHOD_GOOGLE:
                     googleAuthentification(callback);
                     break;
             }
@@ -80,8 +88,8 @@ public class SpottedLocalDataSource implements SpottedDataSource {
                 AccessToken.refreshCurrentAccessTokenAsync(new AccessToken.AccessTokenRefreshCallback() {
                     @Override
                     public void OnTokenRefreshed(AccessToken accessToken) {
-                        mSharedPreferencesHelper.setLastSignInMethod(SharedPreferencesHelper.LAST_SIGN_IN_METHOD_FACEBOOK);
-                        mSharedPreferencesHelper.setFacebookToken(accessToken.getToken());
+                        mSharedPreferencesManager.setLastSignInMethod(SharedPreferencesManager.LAST_SIGN_IN_METHOD_FACEBOOK);
+                        mSharedPreferencesManager.setFacebookToken(accessToken.getToken());
                         callback.userIsLoggedIn();
                     }
 
@@ -118,8 +126,8 @@ public class SpottedLocalDataSource implements SpottedDataSource {
 
     private void handleGoogleResult(GoogleSignInResult googleSignInResult, UserLoginStatusCallback callback){
         if(googleSignInResult != null && googleSignInResult.isSuccess()){
-            mSharedPreferencesHelper.setLastSignInMethod(SharedPreferencesHelper.LAST_SIGN_IN_METHOD_GOOGLE);
-            mSharedPreferencesHelper.setGoogleToken(googleSignInResult.getSignInAccount().getIdToken());
+            mSharedPreferencesManager.setLastSignInMethod(SharedPreferencesManager.LAST_SIGN_IN_METHOD_GOOGLE);
+            mSharedPreferencesManager.setGoogleToken(googleSignInResult.getSignInAccount().getIdToken());
             callback.userIsLoggedIn();
         }
         else {
@@ -169,12 +177,12 @@ public class SpottedLocalDataSource implements SpottedDataSource {
 
     @Override
     public boolean getDefaultAnonymity() {
-        return mSharedPreferencesHelper.getDefaultAnonymity();
+        return mSharedPreferencesManager.getDefaultAnonymity();
     }
 
     @Override
     public void setDefaultAnonymity(boolean anonymity) {
-        mSharedPreferencesHelper.setDefaultAnonymity(anonymity);
+        mSharedPreferencesManager.setDefaultAnonymity(anonymity);
     }
 
     @Override
@@ -254,26 +262,26 @@ public class SpottedLocalDataSource implements SpottedDataSource {
     }
 
     public void setFacebookAuthPrefs(String userId, String token){
-        mSharedPreferencesHelper.setLastSignInMethod(SharedPreferencesHelper.LAST_SIGN_IN_METHOD_FACEBOOK);
-        mSharedPreferencesHelper.setFacebookUserId(userId);
-        mSharedPreferencesHelper.setFacebookToken(token);
+        mSharedPreferencesManager.setLastSignInMethod(SharedPreferencesManager.LAST_SIGN_IN_METHOD_FACEBOOK);
+        mSharedPreferencesManager.setFacebookUserId(userId);
+        mSharedPreferencesManager.setFacebookToken(token);
     }
 
     public void setGoogleAuthPrefs(String userId, String token){
-        mSharedPreferencesHelper.setLastSignInMethod(SharedPreferencesHelper.LAST_SIGN_IN_METHOD_GOOGLE);
-        mSharedPreferencesHelper.setGoogleUserId(userId);
-        mSharedPreferencesHelper.setGoogleToken(token);
+        mSharedPreferencesManager.setLastSignInMethod(SharedPreferencesManager.LAST_SIGN_IN_METHOD_GOOGLE);
+        mSharedPreferencesManager.setGoogleUserId(userId);
+        mSharedPreferencesManager.setGoogleToken(token);
     }
 
     public void clearFacebookLoginPrefenrences(){
-        mSharedPreferencesHelper.setLastSignInMethod(SharedPreferencesHelper.LAST_SIGN_IN_METHOD_NONE);
-        mSharedPreferencesHelper.setFacebookToken(null);
-        mSharedPreferencesHelper.setFacebookUserId(null);
+        mSharedPreferencesManager.setLastSignInMethod(SharedPreferencesManager.LAST_SIGN_IN_METHOD_NONE);
+        mSharedPreferencesManager.setFacebookToken(null);
+        mSharedPreferencesManager.setFacebookUserId(null);
     }
 
     public void clearGoogleLoginPrefenrences(){
-        mSharedPreferencesHelper.setLastSignInMethod(SharedPreferencesHelper.LAST_SIGN_IN_METHOD_NONE);
-        mSharedPreferencesHelper.setGoogleToken(null);
-        mSharedPreferencesHelper.setGoogleUserId(null);
+        mSharedPreferencesManager.setLastSignInMethod(SharedPreferencesManager.LAST_SIGN_IN_METHOD_NONE);
+        mSharedPreferencesManager.setGoogleToken(null);
+        mSharedPreferencesManager.setGoogleUserId(null);
     }
 }

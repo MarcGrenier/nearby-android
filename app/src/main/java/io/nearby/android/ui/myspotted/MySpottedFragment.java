@@ -19,9 +19,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.inject.Inject;
-
-import io.nearby.android.NearbyApplication;
 import io.nearby.android.R;
 import io.nearby.android.data.Spotted;
 import io.nearby.android.ui.BaseFragment;
@@ -34,7 +31,7 @@ public class MySpottedFragment extends BaseFragment<MySpottedContract.Presenter>
     private static final int VISIBLE_THRESHOLD = 5;
     private static final int LAYOUT = R.layout.my_spotted_fragment;
 
-    @Inject MySpottedPresenter mPresenter;
+    private MySpottedPresenter mPresenter;
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
@@ -61,11 +58,7 @@ public class MySpottedFragment extends BaseFragment<MySpottedContract.Presenter>
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerMySpottedComponent.builder()
-                .mySpottedPresenterModule(new MySpottedPresenterModule(this))
-                .dataManagerComponent(((NearbyApplication) getActivity().getApplication())
-                        .getDataManagerComponent()).build()
-                .inject(this);
+        mPresenter = new MySpottedPresenter(this);
     }
 
     @Nullable
@@ -195,11 +188,6 @@ public class MySpottedFragment extends BaseFragment<MySpottedContract.Presenter>
     @Override
     public void stopRefreshing() {
         mSwipeRefreshLayout.setRefreshing(false);
-    }
-
-    @Override
-    public void setPresenter(MySpottedContract.Presenter presenter) {
-        mPresenter = (MySpottedPresenter) presenter;
     }
 
     private void showEmptyListMessage() {

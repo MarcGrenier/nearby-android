@@ -31,16 +31,11 @@ import com.google.android.gms.location.LocationServices;
 import java.io.File;
 import java.io.IOException;
 
-import javax.inject.Inject;
-
-import io.nearby.android.NearbyApplication;
 import io.nearby.android.R;
 import io.nearby.android.ui.BaseActivity;
 import io.nearby.android.util.GoogleApiClientBuilder;
 import io.nearby.android.util.ImageUtil;
 import timber.log.Timber;
-
-import static dagger.internal.Preconditions.checkNotNull;
 
 public class NewSpottedActivity extends BaseActivity<NewSpottedContract.Presenter> implements View.OnClickListener, NewSpottedContract.View, GoogleApiClient.ConnectionCallbacks {
 
@@ -56,7 +51,7 @@ public class NewSpottedActivity extends BaseActivity<NewSpottedContract.Presente
 
     private ProgressDialog mProgressDialog;
 
-    @Inject NewSpottedPresenter mPresenter;
+    private NewSpottedPresenter mPresenter;
 
     private boolean mGoogleLocationServiceIsConnected = false;
     private GoogleApiClient mGoogleApiClient;
@@ -69,6 +64,8 @@ public class NewSpottedActivity extends BaseActivity<NewSpottedContract.Presente
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_spotted_activity);
 
+        mPresenter = new NewSpottedPresenter(this);
+
         initializeView();
 
         mGoogleApiClient = new GoogleApiClientBuilder(this)
@@ -76,12 +73,6 @@ public class NewSpottedActivity extends BaseActivity<NewSpottedContract.Presente
                 .addLocationServicesApi()
                 .addConnectionCallbacks(this)
                 .build();
-
-        DaggerNewSpottedComponent.builder()
-                .newSpottedPresenterModule(new NewSpottedPresenterModule(this))
-                .dataManagerComponent(((NearbyApplication) getApplication())
-                        .getDataManagerComponent()).build()
-                .inject(this);
 
         mAnonymity = mPresenter.getDefaultAnonymity();
         updateAnonymityIcon();
@@ -188,11 +179,6 @@ public class NewSpottedActivity extends BaseActivity<NewSpottedContract.Presente
     @Override
     public void onConnectionSuspended(int i) {
         mGoogleLocationServiceIsConnected = false;
-    }
-
-    @Override
-    public void setPresenter(@NonNull NewSpottedContract.Presenter presenter) {
-        mPresenter = (NewSpottedPresenter) checkNotNull(presenter);
     }
 
     private void initializeView(){

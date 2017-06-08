@@ -16,9 +16,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import javax.inject.Inject;
-
-import io.nearby.android.NearbyApplication;
 import io.nearby.android.R;
 import io.nearby.android.data.User;
 import io.nearby.android.ui.BaseActivity;
@@ -34,8 +31,6 @@ public class MainActivity extends BaseActivity<MainContract.Presenter>
     private static final int DEFAULT_NAV_DRAWER_ITEM = R.id.map;
     private static final String NAV_DRAWER_INDEX = "nav_drawer_index";
 
-    @Inject MainPresenter mPresenter;
-
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
     private Toolbar mToolbar;
@@ -46,10 +41,14 @@ public class MainActivity extends BaseActivity<MainContract.Presenter>
 
     private int mCurrentNavDrawerItem = DEFAULT_NAV_DRAWER_ITEM;
 
+    private MainPresenter mPresenter;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+
+        mPresenter = new MainPresenter(this);
 
         if(savedInstanceState != null){
             mCurrentNavDrawerItem = savedInstanceState.getInt(NAV_DRAWER_INDEX);
@@ -62,12 +61,6 @@ public class MainActivity extends BaseActivity<MainContract.Presenter>
         mProfilePictureImageView = (ImageView) mNavigationView.getHeaderView(0).findViewById(R.id.profile_picture);
 
         this.setupActionBarAndNavigationDrawer();
-
-        DaggerMainComponent.builder()
-                .mainPresenterModule(new MainPresenterModule(this))
-                .dataManagerComponent(((NearbyApplication) getApplication())
-                        .getDataManagerComponent()).build()
-                .inject(this);
 
         mPresenter.getUserInfo();
     }
@@ -127,11 +120,6 @@ public class MainActivity extends BaseActivity<MainContract.Presenter>
                     .transform(new CircleTransform(this))
                     .into(mProfilePictureImageView);
         }
-    }
-
-    @Override
-    public void setPresenter(MainContract.Presenter presenter) {
-        mPresenter = (MainPresenter) presenter;
     }
 
     private void setupActionBarAndNavigationDrawer(){

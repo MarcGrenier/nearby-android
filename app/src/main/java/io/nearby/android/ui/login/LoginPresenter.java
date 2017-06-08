@@ -3,24 +3,16 @@ package io.nearby.android.ui.login;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
-import javax.inject.Inject;
-
 import io.nearby.android.data.source.DataManager;
 import io.nearby.android.data.source.SpottedDataSource;
 
 public class LoginPresenter implements LoginContract.Presenter {
 
-    private DataManager mDataManager;
     private LoginContract.View mView;
 
-    @Inject
-    public LoginPresenter(LoginContract.View loginView, DataManager dataManager) {
+    public LoginPresenter(LoginContract.View loginView) {
         mView = loginView;
-        mDataManager = dataManager;
     }
-
-    @Inject
-    void setupListeners(){ mView.setPresenter(this);}
 
     @Override
     public void loginWithFacebook(LoginResult loginResult) {
@@ -52,7 +44,7 @@ public class LoginPresenter implements LoginContract.Presenter {
         String token = loginResult.getAccessToken().getToken();
         String userId = loginResult.getAccessToken().getUserId();
 
-        mDataManager.facebookLogin(userId,token,
+        DataManager.getInstance().facebookLogin(userId,token,
                 new SpottedDataSource.LoginCallback() {
                     @Override
                     public void onAccountCreated() {
@@ -78,7 +70,7 @@ public class LoginPresenter implements LoginContract.Presenter {
         String idToken = account.getIdToken();
         String userId = account.getId();
 
-        mDataManager.googleLogin(userId, idToken, new SpottedDataSource.LoginCallback() {
+        DataManager.getInstance().googleLogin(userId, idToken, new SpottedDataSource.LoginCallback() {
             @Override
             public void onAccountCreated() {
                 mView.onLoginSuccessful();

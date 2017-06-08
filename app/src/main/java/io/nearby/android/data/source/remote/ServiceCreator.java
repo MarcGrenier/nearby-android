@@ -6,7 +6,7 @@ import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.io.IOException;
 
-import io.nearby.android.data.source.local.SharedPreferencesHelper;
+import io.nearby.android.data.source.local.SharedPreferencesManager;
 import okhttp3.Credentials;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -23,14 +23,14 @@ public class ServiceCreator<T> {
 
     private OkHttpClient.Builder mOkHttpClientBuilder;
     private String mEndPoint;
-    private SharedPreferencesHelper mSharedPreferenceHelper;
+    private SharedPreferencesManager mSharedPreferenceHelper;
     private Class<T> mServiceClass;
 
-    public ServiceCreator(Class<T> serviceClass, String endPoint, SharedPreferencesHelper sharedPreferencesHelper){
+    public ServiceCreator(Class<T> serviceClass, String endPoint, SharedPreferencesManager sharedPreferencesManager){
         mOkHttpClientBuilder = new OkHttpClient.Builder();
         mServiceClass = serviceClass;
         mEndPoint = endPoint;
-        mSharedPreferenceHelper = sharedPreferencesHelper;
+        mSharedPreferenceHelper = sharedPreferencesManager;
     }
 
     public T create() {
@@ -110,12 +110,12 @@ public class ServiceCreator<T> {
                 String provider = "";
 
                 switch(lastSignInMethod){
-                    case SharedPreferencesHelper.LAST_SIGN_IN_METHOD_FACEBOOK:
+                    case SharedPreferencesManager.LAST_SIGN_IN_METHOD_FACEBOOK:
                         provider = "Facebook";
                         userId = mSharedPreferenceHelper.getFacebookUserId();
                         token = mSharedPreferenceHelper.getFacebookToken();
                         break;
-                    case SharedPreferencesHelper.LAST_SIGN_IN_METHOD_GOOGLE:
+                    case SharedPreferencesManager.LAST_SIGN_IN_METHOD_GOOGLE:
                         provider = "Google";
                         userId = mSharedPreferenceHelper.getGoogleUserId();
                         token = mSharedPreferenceHelper.getGoogleToken();

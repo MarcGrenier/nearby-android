@@ -12,9 +12,7 @@ import io.nearby.android.R;
 import io.nearby.android.data.source.Local;
 
 
-@Singleton
-@Local
-public class SharedPreferencesHelper {
+public class SharedPreferencesManager {
 
     public static final int LAST_SIGN_IN_METHOD_NONE = 0;
     public static final int LAST_SIGN_IN_METHOD_GOOGLE = 1;
@@ -23,8 +21,17 @@ public class SharedPreferencesHelper {
     private SharedPreferences mPrefs;
     private Context mContext;
 
-    @Inject
-    public SharedPreferencesHelper(Context context){
+    private static SharedPreferencesManager instance;
+
+    public static SharedPreferencesManager getInstance(){
+        if(instance == null){
+            instance = new SharedPreferencesManager();
+        }
+
+        return instance;
+    }
+
+    private SharedPreferencesManager(Context context){
         mContext = context;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }

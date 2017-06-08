@@ -21,8 +21,6 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-@Singleton
-@Remote
 public interface NearbyService {
 
     String ENDPOINT = "https://nbyapi.mo-bergeron.com/";

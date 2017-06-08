@@ -4,8 +4,6 @@ import android.support.annotation.Nullable;
 
 import java.io.File;
 
-import javax.inject.Inject;
-
 import io.nearby.android.data.Spotted;
 import io.nearby.android.data.source.DataManager;
 import io.nearby.android.data.source.SpottedDataSource;
@@ -15,17 +13,9 @@ import io.nearby.android.util.ImageUtil;
 public class NewSpottedPresenter implements NewSpottedContract.Presenter{
 
     private NewSpottedContract.View mView;
-    private DataManager mDataManager;
 
-    @Inject
-    public NewSpottedPresenter(NewSpottedContract.View view, DataManager dataManager) {
+    public NewSpottedPresenter(NewSpottedContract.View view) {
         this.mView = view;
-        this.mDataManager = dataManager;
-    }
-
-    @Inject
-    void setupListeners(){
-        mView.setPresenter(this);
     }
 
     @Override
@@ -51,7 +41,7 @@ public class NewSpottedPresenter implements NewSpottedContract.Presenter{
             compressPicture = null;
         }
 
-        mDataManager.createSpotted(spotted,
+        DataManager.getInstance().createSpotted(spotted,
                 compressPicture,
                 new SpottedDataSource.SpottedCreatedCallback() {
                     @Override
@@ -77,11 +67,11 @@ public class NewSpottedPresenter implements NewSpottedContract.Presenter{
 
     @Override
     public boolean getDefaultAnonymity() {
-        return mDataManager.getDefaultAnonymity();
+        return DataManager.getInstance().getDefaultAnonymity();
     }
 
     @Override
     public void updateDefaultAnonymity(boolean anonymity) {
-        mDataManager.setDefaultAnonymity(anonymity);
+        DataManager.getInstance().setDefaultAnonymity(anonymity);
     }
 }

@@ -20,9 +20,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.Arrays;
 
-import javax.inject.Inject;
-
-import io.nearby.android.NearbyApplication;
 import io.nearby.android.R;
 import io.nearby.android.ui.main.MainActivity;
 import io.nearby.android.util.GoogleApiClientBuilder;
@@ -35,7 +32,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private GoogleApiClient mGoogleApiClient;
     private CallbackManager mCallbackManager;
 
-    @Inject LoginPresenter mPresenter;
+    private LoginPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +45,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         initializeGoogle();
         initializeFacebook();
 
-        DaggerLoginComponent.builder()
-                .loginPresenterModule(new LoginPresenterModule(this))
-                .dataManagerComponent(((NearbyApplication) getApplication())
-                        .getDataManagerComponent()).build()
-                .inject(this);
+        mPresenter = new LoginPresenter(this);
     }
 
     @Override
@@ -133,11 +126,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .addSignInApi()
                 .enableAutoManage(this,this)
                 .build();
-    }
-
-    @Override
-    public void setPresenter(LoginContract.Presenter presenter) {
-        mPresenter = (LoginPresenter) presenter;
     }
 
     @Override

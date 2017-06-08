@@ -37,7 +37,7 @@ public class SettingsFragment extends PreferenceFragment implements SettingsCont
 
     private static final int RC_GOOGLE_LOGIN = 9001;
 
-    private SettingsContract.Presenter mPresenter;
+    private SettingsPresenter mPresenter;
     private GoogleApiClient mGoogleApiClient;
     private CallbackManager mCallbackManager;
 
@@ -52,6 +52,8 @@ public class SettingsFragment extends PreferenceFragment implements SettingsCont
     
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mPresenter = new SettingsPresenter(this);
 
         addPreferencesFromResource(R.xml.preferences);
 
@@ -135,11 +137,6 @@ public class SettingsFragment extends PreferenceFragment implements SettingsCont
         else {
             mCallbackManager.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    @Override
-    public void setPresenter(SettingsContract.Presenter presenter) {
-        mPresenter = presenter;
     }
 
     @Override

@@ -3,8 +3,6 @@ package io.nearby.android.ui.settings;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
-import javax.inject.Inject;
-
 import io.nearby.android.data.User;
 import io.nearby.android.data.source.DataManager;
 import io.nearby.android.data.source.SpottedDataSource;
@@ -13,22 +11,14 @@ import io.nearby.android.ui.BasePresenter;
 public class SettingsPresenter implements SettingsContract.Presenter {
 
     private final SettingsContract.View mView;
-    private final DataManager mDataManager;
 
-    @Inject
-    public SettingsPresenter(SettingsContract.View view, DataManager dataManager) {
+    public SettingsPresenter(SettingsContract.View view) {
         mView = view;
-        mDataManager = dataManager;
-    }
-
-    @Inject
-    void setupListeners(){
-        mView.setPresenter(this);
     }
 
     @Override
     public void getUserInfo() {
-        mDataManager.getUserInfo(new SpottedDataSource.UserInfoLoadedCallback() {
+        DataManager.getInstance().getUserInfo(new SpottedDataSource.UserInfoLoadedCallback() {
             @Override
             public void onUserInfoLoaded(User user) {
                 mView.onUserInfoReceived(user);
@@ -49,7 +39,7 @@ public class SettingsPresenter implements SettingsContract.Presenter {
         String userId = loginResult.getAccessToken().getUserId();
         String token = loginResult.getAccessToken().getToken();
 
-        mDataManager.linkFacebookAccount(userId, token, new SpottedDataSource.FacebookLinkAccountCallback() {
+        DataManager.getInstance().linkFacebookAccount(userId, token, new SpottedDataSource.FacebookLinkAccountCallback() {
             @Override
             public void onFacebookAccountAlreadyExist(String userId, String token) {
                 mView.onFacebookAccountAlreadyExist(userId, token);
@@ -74,7 +64,7 @@ public class SettingsPresenter implements SettingsContract.Presenter {
         String userId = account.getId();
         String token = account.getIdToken();
 
-        mDataManager.linkGoogleAccount(userId, token, new SpottedDataSource.GoogleLinkAccountCallback() {
+        DataManager.getInstance().linkGoogleAccount(userId, token, new SpottedDataSource.GoogleLinkAccountCallback() {
             @Override
             public void onGoogleAccountAlreadyExist(String userId, String token) {
                 mView.onGoogleAccountAlreadyExist(userId, token);
@@ -96,7 +86,7 @@ public class SettingsPresenter implements SettingsContract.Presenter {
 
     @Override
     public void logout() {
-        mDataManager.signOut(new SpottedDataSource.Callback() {
+        DataManager.getInstance().signOut(new SpottedDataSource.Callback() {
             @Override
             public void onSuccess() {
                 mView.onSignOutCompleted();
@@ -114,7 +104,7 @@ public class SettingsPresenter implements SettingsContract.Presenter {
 
     @Override
     public void deactivateAccount() {
-        mDataManager.deactivateAccount(new SpottedDataSource.Callback() {
+        DataManager.getInstance().deactivateAccount(new SpottedDataSource.Callback() {
             @Override
             public void onSuccess() {
                 mView.onAccountDeactivated();
@@ -131,7 +121,7 @@ public class SettingsPresenter implements SettingsContract.Presenter {
 
     @Override
     public void mergeFacebookAccount(String userId, String token) {
-        mDataManager.mergeFacebookAccount(userId, token, new SpottedDataSource.Callback(){
+        DataManager.getInstance().mergeFacebookAccount(userId, token, new SpottedDataSource.Callback(){
             @Override
             public void onSuccess() {
                 mView.onFacebookAccountMerged();
@@ -148,7 +138,7 @@ public class SettingsPresenter implements SettingsContract.Presenter {
 
     @Override
     public void mergeGoogleAccount(String userId, String token) {
-        mDataManager.mergeGoogleAccount(userId, token, new SpottedDataSource.Callback(){
+        DataManager.getInstance().mergeGoogleAccount(userId, token, new SpottedDataSource.Callback(){
             @Override
             public void onSuccess() {
                 mView.onGoogleAccountMerged();

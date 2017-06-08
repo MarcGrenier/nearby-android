@@ -33,18 +33,24 @@ import timber.log.Timber;
 
 import static dagger.internal.Preconditions.checkNotNull;
 
-@Singleton
-@Remote
 public class SpottedRemoteDataSource implements SpottedDataSource {
 
     private NearbyService mNearbyService;
     private CompositeDisposable mCompositeDisposable;
 
-    @Inject
-    public SpottedRemoteDataSource(@NonNull NearbyService nearbyService){
-        checkNotNull(nearbyService);
-        mNearbyService = nearbyService;
+    private static SpottedRemoteDataSource instance;
 
+    public static SpottedRemoteDataSource getInstance() {
+        if(instance == null){
+            instance = new SpottedRemoteDataSource();
+        }
+        return instance;
+    }
+
+    private SpottedRemoteDataSource(){
+        ServiceCreator<NearbyService> creator = new ServiceCreator<>(NearbyService.class,
+                NearbyService.ENDPOINT, sharedPreferencesManager);
+        creator.create();
         mCompositeDisposable = new CompositeDisposable();
     }
 

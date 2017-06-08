@@ -15,9 +15,6 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
-import io.nearby.android.NearbyApplication;
 import io.nearby.android.R;
 import io.nearby.android.data.Spotted;
 import io.nearby.android.ui.BaseActivity;
@@ -36,20 +33,14 @@ public class SpottedClusterDetailActivity extends BaseActivity<SpottedClusterDet
     private View mProgressBar;
     private View mErrorMessage;
 
-    @Inject
-    SpottedClusterDetailPresenter mPresenter;
+    private SpottedClusterDetailPresenter mPresenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        DaggerSpottedClusterDetailComponent.builder()
-                .spottedClusterDetailPresenterModule(new SpottedClusterDetailPresenterModule(this))
-                .dataManagerComponent(((NearbyApplication) getApplication())
-                        .getDataManagerComponent()).build()
-                .inject(this);
-
         setContentView(R.layout.spotted_cluster_detail_activity);
+
+        mPresenter = new SpottedClusterDetailPresenter(this);
 
         initializeView();
 
@@ -82,11 +73,6 @@ public class SpottedClusterDetailActivity extends BaseActivity<SpottedClusterDet
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
-    }
-
-    @Override
-    public void setPresenter(SpottedClusterDetailContract.Presenter presenter) {
-        mPresenter = (SpottedClusterDetailPresenter) presenter;
     }
 
     @Override

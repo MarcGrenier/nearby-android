@@ -35,9 +35,6 @@ import com.google.maps.android.clustering.ClusterManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
-import io.nearby.android.NearbyApplication;
 import io.nearby.android.R;
 import io.nearby.android.data.Spotted;
 import io.nearby.android.ui.BaseFragment;
@@ -76,7 +73,7 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
     private CameraPosition mCameraPosition;
     private boolean mMapInitialized = false;
 
-    @Inject MapPresenter mPresenter;
+    private MapPresenter mPresenter;
 
     public static MapFragment newInstance() {
 
@@ -88,19 +85,8 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
     }
 
     @Override
-    public void setPresenter(MapContract.Presenter presenter) {
-        mPresenter = (MapPresenter) presenter;
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        DaggerMapComponent.builder()
-                .mapPresenterModule(new MapPresenterModule(this))
-                .dataManagerComponent(((NearbyApplication) getActivity().getApplication())
-                        .getDataManagerComponent()).build()
-                .inject(this);
 
         mMapFragment =  SupportMapFragment.newInstance();
         mMapInitialized = false;
