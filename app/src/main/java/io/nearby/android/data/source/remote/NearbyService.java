@@ -2,11 +2,8 @@ package io.nearby.android.data.source.remote;
 
 import java.util.List;
 
-import javax.inject.Singleton;
-
 import io.nearby.android.data.Spotted;
 import io.nearby.android.data.User;
-import io.nearby.android.data.source.Remote;
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;

@@ -16,11 +16,7 @@ import com.google.android.gms.common.api.Status;
 import java.io.File;
 import java.util.Date;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import io.nearby.android.data.Spotted;
-import io.nearby.android.data.source.Local;
 import io.nearby.android.data.source.SpottedDataSource;
 
 public class SpottedLocalDataSource implements SpottedDataSource {
@@ -32,7 +28,7 @@ public class SpottedLocalDataSource implements SpottedDataSource {
 
     public static SpottedLocalDataSource getInstance(){
         if(instance == null){
-            instance = new SpottedLocalDataSource();
+            //instance = new SpottedLocalDataSource();
         }
 
         return instance;

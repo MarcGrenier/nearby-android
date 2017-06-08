@@ -5,11 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.StringRes;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import io.nearby.android.R;
-import io.nearby.android.data.source.Local;
 
 
 public class SharedPreferencesManager {
@@ -25,7 +21,7 @@ public class SharedPreferencesManager {
 
     public static SharedPreferencesManager getInstance(){
         if(instance == null){
-            instance = new SharedPreferencesManager();
+            //instance = new SharedPreferencesManager();
         }
 
         return instance;

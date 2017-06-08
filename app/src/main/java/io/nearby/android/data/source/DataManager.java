@@ -7,9 +7,6 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import io.nearby.android.data.Spotted;
 import io.nearby.android.data.User;
 import io.nearby.android.data.source.local.SpottedLocalDataSource;
@@ -19,8 +16,8 @@ public class DataManager implements SpottedDataSource{
 
     private static DataManager instance;
 
-    private final SpottedLocalDataSource mLocalDataSource;
-    private final SpottedRemoteDataSource mRemoteDataSource;
+    private final SpottedLocalDataSource mLocalDataSource = null;
+    private final SpottedRemoteDataSource mRemoteDataSource = null;
 
 
     public static DataManager getInstance(){
@@ -33,8 +30,8 @@ public class DataManager implements SpottedDataSource{
 
 
     private DataManager() {
-        mRemoteDataSource = new SpottedRemoteDataSource();
-        mLocalDataSource = new SpottedLocalDataSource();
+        //mRemoteDataSource = new SpottedRemoteDataSource();
+        //mLocalDataSource = new SpottedLocalDataSource();
     }
 
     @Override

@@ -1,6 +1,5 @@
 package io.nearby.android.data.source.remote;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
@@ -11,12 +10,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import io.nearby.android.data.Spotted;
 import io.nearby.android.data.User;
-import io.nearby.android.data.source.Remote;
 import io.nearby.android.data.source.SpottedDataSource;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -31,8 +26,6 @@ import okhttp3.ResponseBody;
 import retrofit2.Response;
 import timber.log.Timber;
 
-import static dagger.internal.Preconditions.checkNotNull;
-
 public class SpottedRemoteDataSource implements SpottedDataSource {
 
     private NearbyService mNearbyService;
@@ -42,15 +35,13 @@ public class SpottedRemoteDataSource implements SpottedDataSource {
 
     public static SpottedRemoteDataSource getInstance() {
         if(instance == null){
-            instance = new SpottedRemoteDataSource();
+            //instance = new SpottedRemoteDataSource();
         }
         return instance;
     }
 
-    private SpottedRemoteDataSource(){
-        ServiceCreator<NearbyService> creator = new ServiceCreator<>(NearbyService.class,
-                NearbyService.ENDPOINT, sharedPreferencesManager);
-        creator.create();
+    private SpottedRemoteDataSource(NearbyService nearbyService){
+        mNearbyService = nearbyService;
         mCompositeDisposable = new CompositeDisposable();
     }
 
