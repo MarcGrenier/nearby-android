@@ -11,7 +11,7 @@ import com.google.android.gms.location.LocationServices;
 import io.nearby.android.R;
 
 /**
- * Created by Marc on 2017-01-22.
+ * Created by Marc on 2017-01-22
  */
 
 public class GoogleApiClientBuilder {

@@ -4,38 +4,28 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import javax.inject.Inject;
-
-import io.nearby.android.NearbyApplication;
 import io.nearby.android.ui.login.LoginActivity;
 import io.nearby.android.ui.main.MainActivity;
 
 /**
- * Created by Marc on 2017-01-22.
+ * Created by Marc on 2017-01-22
  */
 
 public class LauncherActivity extends AppCompatActivity implements LauncherContract.View{
 
-    @Inject
-    LauncherPresenter mPresenter;
+    private LauncherPresenter presenter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerLauncherComponent.builder()
-                .launcherPresenterModule(new LauncherPresenterModule(this))
-                .dataManagerComponent(((NearbyApplication) getApplication())
-                        .getDataManagerComponent())
-                .build()
-                .inject(this);
-
-        mPresenter.isUserLoggedIn();
+        presenter = new LauncherPresenter(this);
     }
 
     @Override
-    public void setPresenter(LauncherContract.Presenter presenter) {
-        mPresenter = (LauncherPresenter) presenter;
+    protected void onResume() {
+        super.onResume();
+        presenter.isUserLoggedIn();
     }
 
     @Override

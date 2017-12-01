@@ -14,7 +14,12 @@ public class NearbyApplication extends Application {
             Timber.plant(new Timber.DebugTree());
         }
         else {
-            // TODO Plant release plant.
+            Timber.plant(new Timber.Tree() {
+                @Override
+                protected void log(int priority, String tag, String message, Throwable t) {
+                    // Don't log
+                }
+            });
         }
 
         //Facebook is automatically done when the manifest contains

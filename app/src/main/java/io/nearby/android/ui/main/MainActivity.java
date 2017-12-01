@@ -54,11 +54,11 @@ public class MainActivity extends BaseActivity<MainContract.Presenter>
             mCurrentNavDrawerItem = savedInstanceState.getInt(NAV_DRAWER_INDEX);
         }
 
-        mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mProfileFullName = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.profile_full_name);
-        mProfilePictureImageView = (ImageView) mNavigationView.getHeaderView(0).findViewById(R.id.profile_picture);
+        mNavigationView = findViewById(R.id.navigation_view);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        mToolbar = findViewById(R.id.toolbar);
+        mProfileFullName = mNavigationView.getHeaderView(0).findViewById(R.id.profile_full_name);
+        mProfilePictureImageView = mNavigationView.getHeaderView(0).findViewById(R.id.profile_picture);
 
         this.setupActionBarAndNavigationDrawer();
 
@@ -114,9 +114,9 @@ public class MainActivity extends BaseActivity<MainContract.Presenter>
     public void onUserInfoReceived(User user) {
         mProfileFullName.setText(user.getFullName());
 
-        if(user.getProfilePictureUrl() != null){
+        if(user.getProfilePictureURL() != null){
             Glide.with(this)
-                    .load(user.getProfilePictureUrl())
+                    .load(user.getProfilePictureURL())
                     .transform(new CircleTransform(this))
                     .into(mProfilePictureImageView);
         }
