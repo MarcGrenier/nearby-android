@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import io.nearby.android.R;
+import io.nearby.android.data.Location;
 import io.nearby.android.data.Spotted;
 import io.nearby.android.ui.BaseFragment;
 import io.nearby.android.ui.adapter.SpottedAdapter;
@@ -83,11 +84,11 @@ public class MySpottedFragment extends BaseFragment<MySpottedContract.Presenter>
         mRecyclerView.addItemDecoration(dividerItemDecoration);
 
         mAdapter = new SpottedAdapter(Glide.with(this));
-        mAdapter.setItemClickListener(new Consumer<Spotted>() {
+        mAdapter.setItemClickListener(new SpottedAdapter.OnItemClickListener() {
             @Override
-            public void accept(Spotted spotted) throws Exception {
+            public void onItemClick(Spotted spotted) {
                 Intent intent = new Intent(MySpottedFragment.this.getActivity(), SpottedDetailActivity.class);
-                intent.putExtra(SpottedDetailActivity.EXTRAS_SPOTTED_ID,spotted.getId());
+                intent.putExtra(SpottedDetailActivity.EXTRAS_SPOTTED_ID, spotted.getId());
                 startActivity(intent);
             }
         });
@@ -202,7 +203,7 @@ public class MySpottedFragment extends BaseFragment<MySpottedContract.Presenter>
         List<Spotted> spotteds = new ArrayList<>();
 
         for (int i = 0; i < 10 ; i++){
-            Spotted spotted = new Spotted(Integer.toString(i),"I spotted the spotted #" + i,0,0);
+            Spotted spotted = new Spotted(Integer.toString(i),"I spotted the spotted #" + i, new Location(0,0));
             spotteds.add(spotted);
         }
 

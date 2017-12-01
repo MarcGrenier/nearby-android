@@ -10,7 +10,7 @@ import io.nearby.android.data.source.remote.ServiceCreator;
 import io.nearby.android.util.GoogleApiClientBuilder;
 
 /**
- * Created by Marc on 2017-02-16.
+ * Created by Marc on 2017-02-16
  */
 abstract class DataManagerModule {
 

@@ -22,20 +22,44 @@ public class SpottedAdapter extends android.support.v7.widget.RecyclerView.Adapt
 
     private List<Spotted> mDataset;
     private RequestManager mGlide;
+    private OnItemClickListener onItemClickListener;
 
-    private final PublishSubject<Spotted> onClickSubject = PublishSubject.create();
+    public interface OnItemClickListener{
+        void onItemClick(Spotted spotted);
+    }
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
-    public static class SpottedViewHolder extends RecyclerView.ViewHolder {
-        TextView messageTextView;
-        ImageView pictureImageView;
+    public class SpottedViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private TextView messageTextView;
+        private ImageView pictureImageView;
 
         public SpottedViewHolder(View v) {
             super(v);
-            messageTextView = (TextView) v.findViewById(R.id.spotted_message);
-            pictureImageView = (ImageView) v.findViewById(R.id.spotted_picture);
+            messageTextView = v.findViewById(R.id.spotted_message);
+            pictureImageView = v.findViewById(R.id.spotted_picture);
+        }
+
+        public void bind(String message, String thumbnailUrl){
+            messageTextView.setText(message);
+
+            if (thumbnailUrl == null) {
+                Glide.clear(pictureImageView);
+                pictureImageView.setVisibility(View.GONE);
+            } else {
+                pictureImageView.setVisibility(View.VISIBLE);
+                mGlide.load(thumbnailUrl)
+                        .into(pictureImageView);
+            }
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
+            if(position != RecyclerView.NO_POSITION && onItemClickListener != null) {
+                Spotted spotted = mDataset.get(position);
+                onItemClickListener.onItemClick(spotted);
+            }
         }
     }
 
@@ -47,9 +71,7 @@ public class SpottedAdapter extends android.support.v7.widget.RecyclerView.Adapt
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.spotted_card, parent, false);
-        RecyclerView.ViewHolder viewHolder = new SpottedViewHolder(view);
-
-        return viewHolder;
+        return new SpottedViewHolder(view);
     }
 
     @Override
@@ -57,24 +79,8 @@ public class SpottedAdapter extends android.support.v7.widget.RecyclerView.Adapt
         final Spotted spotted = mDataset.get(position);
         SpottedViewHolder spottedViewHolder = (SpottedViewHolder) holder;
 
-        spottedViewHolder.messageTextView.setText(spotted.getMessage());
-
-        if (spotted.getPictureThumbnailURL() == null) {
-            Glide.clear(spottedViewHolder.pictureImageView);
-            spottedViewHolder.pictureImageView.setVisibility(View.GONE);
-        }
-        else{
-            spottedViewHolder.pictureImageView.setVisibility(View.VISIBLE);
-            mGlide.load(spotted.getPictureThumbnailURL())
-                    .into(spottedViewHolder.pictureImageView);
-        }
-
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickSubject.onNext(spotted);
-            }
-        });
+        spottedViewHolder.bind(spotted.getMessage(),
+                spotted.getThumbnailURL());
     }
 
     @Override
@@ -82,45 +88,45 @@ public class SpottedAdapter extends android.support.v7.widget.RecyclerView.Adapt
         return mDataset.size();
     }
 
-    public Spotted getItem(int position){
+    public Spotted getItem(int position) {
         Spotted spotted = null;
-        if(position >= 0 && position < mDataset.size()){
+        if (position >= 0 && position < mDataset.size()) {
             spotted = mDataset.get(position);
         }
         return spotted;
     }
 
     public void addItem(Spotted spotted) {
-        if(!mDataset.contains(spotted)){
+        if (!mDataset.contains(spotted)) {
             mDataset.add(spotted);
             notifyDataSetChanged();
         }
     }
 
     public void addItems(List<Spotted> spotteds) {
-        for (Spotted spotted : spotteds){
-            if(!mDataset.contains(spotted)) {
+        for (Spotted spotted : spotteds) {
+            if (!mDataset.contains(spotted)) {
                 mDataset.add(spotted);
             }
         }
         notifyDataSetChanged();
     }
 
-    public void setItemClickListener(Consumer<Spotted> onNext){
-        onClickSubject.subscribe(onNext);
+    public void setItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
     public void insert(Spotted spotted) {
-        if(!mDataset.contains(spotted)){
+        if (!mDataset.contains(spotted)) {
             mDataset.add(0, spotted);
             notifyDataSetChanged();
         }
     }
 
-    public void insertAll(List<Spotted> spotteds){
-        for (int i = spotteds.size()-1; i > 0; i--) {
+    public void insertAll(List<Spotted> spotteds) {
+        for (int i = spotteds.size() - 1; i > 0; i--) {
             Spotted spotted = spotteds.get(i);
-            if(!mDataset.contains(spotted)){
+            if (!mDataset.contains(spotted)) {
                 mDataset.add(0, spotted);
             }
         }
