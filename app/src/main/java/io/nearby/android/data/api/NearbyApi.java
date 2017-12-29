@@ -1,9 +1,9 @@
-package io.nearby.android.data.source.remote;
+package io.nearby.android.data.api;
 
 import java.util.List;
 
-import io.nearby.android.data.Spotted;
-import io.nearby.android.data.User;
+import io.nearby.android.data.model.Spotted;
+import io.nearby.android.data.model.User;
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -18,7 +18,7 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-public interface NearbyService {
+public interface NearbyApi {
 
     String ENDPOINT = "https://nbyapi.mo-bergeron.com/";
 

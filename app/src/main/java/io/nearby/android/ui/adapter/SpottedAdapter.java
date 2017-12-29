@@ -14,9 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.nearby.android.R;
-import io.nearby.android.data.Spotted;
-import io.reactivex.functions.Consumer;
-import io.reactivex.subjects.PublishSubject;
+import io.nearby.android.data.model.Spotted;
 
 public class SpottedAdapter extends android.support.v7.widget.RecyclerView.Adapter {
 

@@ -3,7 +3,6 @@ package io.nearby.android.ui.map;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -29,14 +28,13 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.VisibleRegion;
-import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.nearby.android.R;
-import io.nearby.android.data.Spotted;
+import io.nearby.android.data.model.Spotted;
 import io.nearby.android.ui.BaseFragment;
 import io.nearby.android.ui.map.cluster.NearbyClusterManager;
 import io.nearby.android.ui.map.cluster.SpottedClusterItem;
@@ -55,7 +53,7 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
 
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
-    private static final LatLng DEFAULT_LOCATION = new LatLng(45.5015537,-73.5674999);
+    private static final LatLng DEFAULT_LOCATION = new LatLng(45.5015537, -73.5674999);
 
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -88,7 +86,9 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mMapFragment =  SupportMapFragment.newInstance();
+        mPresenter = new MapPresenter(this);
+
+        mMapFragment = SupportMapFragment.newInstance();
         mMapInitialized = false;
 
         //enableAutoManage can't be used because it would be binded with the MainActivity.
@@ -104,21 +104,20 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
                 boolean noConnectivity = false;
 
                 // EXTRA_NO_CONNECTIVITY will always be there if no connectivity is available.
-                if(intent.getExtras().containsKey(ConnectivityManager.EXTRA_NO_CONNECTIVITY)) {
+                if (intent.getExtras().containsKey(ConnectivityManager.EXTRA_NO_CONNECTIVITY)) {
                     noConnectivity = intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY);
                 }
 
-                if(noConnectivity){
+                if (noConnectivity) {
                     showNoConnectivityNotification();
-                }
-                else {
+                } else {
                     hideNoConnectivityNotification();
                 }
             }
         };
 
-        IntentFilter connectivityFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        getActivity().registerReceiver(broadcastReceiver,connectivityFilter);
+        //IntentFilter connectivityFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        //getActivity().registerReceiver(broadcastReceiver, connectivityFilter);
     }
 
     @Override
@@ -132,7 +131,7 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
         view.findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(),NewSpottedActivity.class);
+                Intent intent = new Intent(getActivity(), NewSpottedActivity.class);
                 startActivity(intent);
             }
         });
@@ -178,7 +177,7 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
                                            @NonNull int[] grantResults) {
         mLocationPermissionGranted = false;
 
-        switch(requestCode){
+        switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
@@ -195,7 +194,7 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
      */
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        if(!mMapInitialized){
+        if (!mMapInitialized) {
             mMapFragment.getMapAsync(this);
         }
     }
@@ -225,33 +224,29 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
         mClusterManager = new NearbyClusterManager<>(getContext(), mMap);
         mClusterManager.setOnCameraIdleListener(this);
         mClusterManager.setOnClusterItemClickListener(this);
-        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<SpottedClusterItem>() {
-            @Override
-            public boolean onClusterClick(Cluster<SpottedClusterItem> cluster) {
-                if(mMap.getCameraPosition().zoom > 19){
-                    ArrayList<Parcelable> spotteds = new ArrayList<>();
+        mClusterManager.setOnClusterClickListener(cluster -> {
+            if (mMap.getCameraPosition().zoom > 19) {
+                ArrayList<Parcelable> spotteds = new ArrayList<>();
 
-                    for(SpottedClusterItem item : cluster.getItems()){
-                        spotteds.add(item);
-                    }
-
-                    Intent intent = new Intent(getActivity(), SpottedClusterDetailActivity.class);
-                    intent.putParcelableArrayListExtra(SpottedClusterDetailActivity.EXTRAS_SPOTTEDS, spotteds);
-                    getActivity().startActivity(intent);
-                }
-                else {
-                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
-                    for(SpottedClusterItem item : cluster.getItems()){
-                        builder.include(item.getLatLng());
-                    }
-
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(),128));
-                    //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(cluster.getPosition(), mMap.getCameraPosition().zoom + 1));
+                for (SpottedClusterItem item : cluster.getItems()) {
+                    spotteds.add(item);
                 }
 
-                return true;
+                Intent intent = new Intent(getActivity(), SpottedClusterDetailActivity.class);
+                intent.putParcelableArrayListExtra(SpottedClusterDetailActivity.EXTRAS_SPOTTEDS, spotteds);
+                getActivity().startActivity(intent);
+            } else {
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+                for (SpottedClusterItem item : cluster.getItems()) {
+                    builder.include(item.getPosition());
+                }
+
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 128));
+                //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(cluster.getPosition(), mMap.getCameraPosition().zoom + 1));
             }
+
+            return true;
         });
 
         mMap.setOnCameraIdleListener(mClusterManager);
@@ -277,13 +272,13 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
         LatLng northeast = visibleRegion.latLngBounds.northeast;
         LatLng southWest = visibleRegion.latLngBounds.southwest;
 
-        mPresenter.getSpotteds(southWest.latitude,northeast.latitude,southWest.longitude,northeast.longitude);
+        mPresenter.getSpotteds(southWest.latitude, northeast.latitude, southWest.longitude, northeast.longitude);
     }
 
     @Override
     public boolean onClusterItemClick(SpottedClusterItem spottedClusterItem) {
         Intent intent = new Intent(getActivity(), SpottedDetailActivity.class);
-        intent.putExtra(SpottedDetailActivity.EXTRAS_SPOTTED_ID,spottedClusterItem.getId());
+        intent.putExtra(SpottedDetailActivity.EXTRAS_SPOTTED_ID, spottedClusterItem.getSpotted().getId());
         getActivity().startActivity(intent);
 
         return true;
@@ -295,12 +290,10 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
             SpottedClusterItem item = new SpottedClusterItem(spotted);
             mClusterManager.addItem(item);
         }
-
-        mClusterManager.cluster();
     }
 
     private void updateLocationUI() {
-        if(mMap == null){
+        if (mMap == null) {
             return;
         }
 
@@ -312,7 +305,7 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
         if (ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
         } else {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
 
         if (mLocationPermissionGranted) {
@@ -325,11 +318,11 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
         }
     }
 
-    private void getDeviceLocation(){
-        if (ContextCompat.checkSelfPermission(getContext(),android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    private void getDeviceLocation() {
+        if (ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
         } else {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
 
         /*
@@ -346,7 +339,7 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
         if (mCameraPosition != null) {
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
         } else if (mLastKnownLocation != null) {
-            LatLng currentLatLng = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+            LatLng currentLatLng = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, DEFAULT_ZOOM));
         } else {
             Timber.d("Current location is null. Using defaults.");
@@ -359,9 +352,9 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
         mNoInternetConnectionView.setVisibility(View.VISIBLE);
     }
 
-    private void hideNoConnectivityNotification(){
+    private void hideNoConnectivityNotification() {
 
-        if(mNoInternetConnectionView.getVisibility() == View.VISIBLE){
+        if (mNoInternetConnectionView.getVisibility() == View.VISIBLE) {
             // Call onCameraIdle() which will fetch the spotteds.
             onCameraIdle();
         }
@@ -372,7 +365,7 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
     /**
      * Adds 25 dummy spotted
      */
-    private void addDummyClusteredSpotted(){
+    private void addDummyClusteredSpotted() {
         // Set some lat/lng coordinates to start with.
         double lat = 45.4946433;
         double lng = -73.5627956;
@@ -381,7 +374,8 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
             double offset = i / 180d;
             lat = lat + offset;
             lng = lng + offset;
-            Spotted spotted = new Spotted(Integer.toString(i),"Y ce passe quelque chose",lat, lng);
+            io.nearby.android.data.model.Location location = new io.nearby.android.data.model.Location(lat, lng);
+            Spotted spotted = new Spotted(Integer.toString(i), "Y ce passe quelque chose", location, false);
             SpottedClusterItem spottedClusterItem = new SpottedClusterItem(spotted);
 
             mClusterManager.addItem(spottedClusterItem);

@@ -22,7 +22,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.Arrays;
 
 import io.nearby.android.R;
-import io.nearby.android.data.User;
+import io.nearby.android.data.model.User;
 import io.nearby.android.ui.BaseFragment;
 import io.nearby.android.ui.launcher.LauncherActivity;
 import io.nearby.android.util.GoogleApiClientBuilder;

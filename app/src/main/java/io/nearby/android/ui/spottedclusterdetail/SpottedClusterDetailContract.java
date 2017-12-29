@@ -2,11 +2,11 @@ package io.nearby.android.ui.spottedclusterdetail;
 
 import java.util.List;
 
-import io.nearby.android.data.Spotted;
+import io.nearby.android.data.model.Spotted;
 import io.nearby.android.ui.BaseView;
 
 /**
- * Created by Marc on 2017-03-05.
+ * Created by Marc on 2017-03-05
  */
 
 public interface SpottedClusterDetailContract {

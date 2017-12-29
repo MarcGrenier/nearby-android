@@ -16,11 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.nearby.android.R;
-import io.nearby.android.data.Spotted;
+import io.nearby.android.data.model.Spotted;
 import io.nearby.android.ui.BaseActivity;
 import io.nearby.android.ui.adapter.SpottedAdapter;
 import io.nearby.android.ui.spotteddetail.SpottedDetailActivity;
-import io.reactivex.functions.Consumer;
 
 public class SpottedClusterDetailActivity extends BaseActivity<SpottedClusterDetailContract.Presenter> implements SpottedClusterDetailContract.View{
 
@@ -49,18 +48,18 @@ public class SpottedClusterDetailActivity extends BaseActivity<SpottedClusterDet
             ArrayList<Spotted> spotteds = extras.getParcelableArrayList(EXTRAS_SPOTTEDS);
             if(spotteds != null && spotteds.size() > 0){
 
-                double minLat = spotteds.get(0).getLatitude(),
+                double minLat = spotteds.get(0).getLocation().getLatitude(),
                         maxLat = minLat,
-                        minLng = spotteds.get(0).getLongitude(),
+                        minLng = spotteds.get(0).getLocation().getLongitude(),
                         maxLng = minLng;
 
 
                 for (int i=1 ; i< spotteds.size() ; i++) {
-                    minLat = Math.min(spotteds.get(i).getLatitude(), minLat);
-                    minLng = Math.min(spotteds.get(i).getLongitude(), minLng);
+                    minLat = Math.min(spotteds.get(i).getLocation().getLatitude(), minLat);
+                    minLng = Math.min(spotteds.get(i).getLocation().getLongitude(), minLng);
 
-                    maxLat = Math.max(spotteds.get(i).getLatitude(), maxLat);
-                    maxLng = Math.max(spotteds.get(i).getLongitude(), maxLng);
+                    maxLat = Math.max(spotteds.get(i).getLocation().getLatitude(), maxLat);
+                    maxLng = Math.max(spotteds.get(i).getLocation().getLongitude(), maxLng);
                 }
 
                 mPresenter.getSpottedsDetails(minLat, maxLat, minLng, maxLng);
@@ -116,13 +115,10 @@ public class SpottedClusterDetailActivity extends BaseActivity<SpottedClusterDet
         mRecyclerView.addItemDecoration(dividerItemDecoration);
 
         mAdapter = new SpottedAdapter(Glide.with(this));
-        mAdapter.setItemClickListener(new Consumer<Spotted>() {
-            @Override
-            public void accept(Spotted spotted) throws Exception {
-                Intent intent = new Intent(SpottedClusterDetailActivity.this, SpottedDetailActivity.class);
-                intent.putExtra(SpottedDetailActivity.EXTRAS_SPOTTED_ID,spotted.getId());
-                startActivity(intent);
-            }
+        mAdapter.setItemClickListener(spotted -> {
+            Intent intent = new Intent(SpottedClusterDetailActivity.this, SpottedDetailActivity.class);
+            intent.putExtra(SpottedDetailActivity.EXTRAS_SPOTTED_ID,spotted.getId());
+            startActivity(intent);
         });
         mRecyclerView.setAdapter(mAdapter);
     }

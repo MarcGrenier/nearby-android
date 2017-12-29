@@ -4,13 +4,14 @@ import android.support.annotation.Nullable;
 
 import java.io.File;
 
-import io.nearby.android.data.Spotted;
-import io.nearby.android.data.source.DataManager;
-import io.nearby.android.data.source.SpottedDataSource;
-import io.nearby.android.ui.BasePresenter;
+import io.nearby.android.data.manager.ClientManager;
+import io.nearby.android.data.manager.SpottedManager;
+import io.nearby.android.data.model.Location;
+import io.nearby.android.data.model.Spotted;
 import io.nearby.android.util.ImageUtil;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
-public class NewSpottedPresenter implements NewSpottedContract.Presenter{
+public class NewSpottedPresenter implements NewSpottedContract.Presenter {
 
     private NewSpottedContract.View mView;
 
@@ -23,55 +24,43 @@ public class NewSpottedPresenter implements NewSpottedContract.Presenter{
                               double lng,
                               String message,
                               boolean anonymity,
-                              @Nullable File file){
+                              @Nullable File file) {
         mView.showSendingProgressDialog();
 
         final File compressPicture;
+        Location location = new Location(lat, lng);
 
         Spotted spotted = new Spotted(Spotted.DEFAULT_ID,
                 message,
-                lat,
-                lng,
+                location,
                 anonymity);
 
-        if(file != null){
+        if (file != null) {
             compressPicture = ImageUtil.compressBitmap(file);
-        }
-        else {
+        } else {
             compressPicture = null;
         }
 
-        DataManager.getInstance().createSpotted(spotted,
-                compressPicture,
-                new SpottedDataSource.SpottedCreatedCallback() {
-                    @Override
-                    public void onSpottedCreated() {
-                        mView.onSpottedCreated();
-                        if(compressPicture != null){
-                            compressPicture.delete();
-                        }
+        SpottedManager.createSpotted(spotted, compressPicture)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(o -> mView.onSpottedCreated())
+                .doOnError(throwable -> mView.onSpottedNotCreated())
+                .doOnComplete(() -> {
+                    mView.hideSendingProgressDialog();
+                    if (compressPicture != null) {
+                        compressPicture.delete();
                     }
-
-                    @Override
-                    public void onError(SpottedDataSource.ErrorType errorType) {
-                        mView.hideSendingProgressDialog();
-                        if(!BasePresenter.manageError(mView, errorType)){
-                            mView.onSpottedNotCreated();
-                        }
-                        if(compressPicture != null){
-                            compressPicture.delete();
-                        }
-                    }
-                });
+                })
+                .subscribe();
     }
 
     @Override
     public boolean getDefaultAnonymity() {
-        return DataManager.getInstance().getDefaultAnonymity();
+        return ClientManager.getDefaultAnonymity();
     }
 
     @Override
     public void updateDefaultAnonymity(boolean anonymity) {
-        DataManager.getInstance().setDefaultAnonymity(anonymity);
+        ClientManager.setDefaultAnonymity(anonymity);
     }
 }

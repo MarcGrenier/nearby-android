@@ -3,15 +3,15 @@ package io.nearby.android.ui.login;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
-import io.nearby.android.data.source.DataManager;
-import io.nearby.android.data.source.SpottedDataSource;
+import io.nearby.android.data.manager.AuthenticationManager;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class LoginPresenter implements LoginContract.Presenter {
 
-    private LoginContract.View mView;
+    private LoginContract.View view;
 
     public LoginPresenter(LoginContract.View loginView) {
-        mView = loginView;
+        view = loginView;
     }
 
     @Override
@@ -44,25 +44,19 @@ public class LoginPresenter implements LoginContract.Presenter {
         String token = loginResult.getAccessToken().getToken();
         String userId = loginResult.getAccessToken().getUserId();
 
-        DataManager.getInstance().facebookLogin(userId,token,
-                new SpottedDataSource.LoginCallback() {
-                    @Override
-                    public void onAccountCreated() {
-                        mView.onLoginSuccessful();
+        AuthenticationManager.facebookLogin(userId, token)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(loginResult1 -> {
+                    switch (loginResult1.getStatus()) {
+                        case LOGGED_IN:
+                        case ACCOUNT_CREATED:
+                            view.onLoginSuccessful();
+                            break;
+                        case NOT_LOGGED_IN:
+                            view.onLoginFailed();
                     }
-
-                    @Override
-                    public void onLoginSuccess() {
-                        mView.onLoginSuccessful();
-                    }
-
-                    @Override
-                    public void onError(SpottedDataSource.ErrorType errorType) {
-                        mView.onLoginFailed();
-                    }
-                });
-
-
+                })
+                .subscribe();
     }
 
     @Override
@@ -70,21 +64,18 @@ public class LoginPresenter implements LoginContract.Presenter {
         String idToken = account.getIdToken();
         String userId = account.getId();
 
-        DataManager.getInstance().googleLogin(userId, idToken, new SpottedDataSource.LoginCallback() {
-            @Override
-            public void onAccountCreated() {
-                mView.onLoginSuccessful();
-            }
-
-            @Override
-            public void onLoginSuccess() {
-                mView.onLoginSuccessful();
-            }
-
-            @Override
-            public void onError(SpottedDataSource.ErrorType errorType) {
-                mView.onLoginFailed();
-            }
-        });
+        AuthenticationManager.googleLogin(userId, idToken)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(loginResult1 -> {
+                    switch (loginResult1.getStatus()) {
+                        case LOGGED_IN:
+                        case ACCOUNT_CREATED:
+                            view.onLoginSuccessful();
+                            break;
+                        case NOT_LOGGED_IN:
+                            view.onLoginFailed();
+                    }
+                })
+                .subscribe();
     }
 }

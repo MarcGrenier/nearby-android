@@ -13,7 +13,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import io.nearby.android.R;
-import io.nearby.android.data.Spotted;
+import io.nearby.android.data.model.Spotted;
 import io.nearby.android.ui.BaseActivity;
 import io.nearby.android.ui.glide.CircleTransform;
 import io.nearby.android.util.TimeUtils;
@@ -74,11 +74,11 @@ public class SpottedDetailActivity extends BaseActivity<SpottedDetailContract.Pr
         mCreationDateTextView.setText(TimeUtils.getHumanFriendlyTimeAgo(this,spotted.getCreationDate()));
 
         // Load profile picture and full name of the owner of the spotted if thr spotted is public.
-        if(!spotted.isAnonymous()){
+        if(!spotted.getAnonymity()){
             mFullNameTextView.setText(spotted.getFullName());
 
             Glide.with(this)
-                    .load(spotted.getProfilePictureUrl())
+                    .load(spotted.getProfilePictureURL())
                     .transform(new CircleTransform(this))
                     .fallback(R.drawable.ic_person)
                     .into(mProfilePictureImageView);
@@ -86,9 +86,9 @@ public class SpottedDetailActivity extends BaseActivity<SpottedDetailContract.Pr
 
         // Load the spotted picture if the spotted has one.
         // Once the picture is loaded or that an error occurred, the progress bar will be hidden.
-        if(spotted.getPictureUrl() != null){
+        if(spotted.getPictureURL() != null){
             Glide.with(this)
-                    .load(spotted.getPictureUrl())
+                    .load(spotted.getPictureURL())
                     .listener(new RequestListener<String, GlideDrawable>() {
                         @Override
                         public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -117,11 +117,6 @@ public class SpottedDetailActivity extends BaseActivity<SpottedDetailContract.Pr
     @Override
     public void hideProgressBar(){
         mProgressBarContainer.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void setPresenter(SpottedDetailContract.Presenter presenter) {
-        mPresenter = (SpottedDetailPresenter) presenter;
     }
 
     /**

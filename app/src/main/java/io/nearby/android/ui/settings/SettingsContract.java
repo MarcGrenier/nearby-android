@@ -3,7 +3,7 @@ package io.nearby.android.ui.settings;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
-import io.nearby.android.data.User;
+import io.nearby.android.data.model.User;
 import io.nearby.android.ui.BaseView;
 
 public interface SettingsContract {

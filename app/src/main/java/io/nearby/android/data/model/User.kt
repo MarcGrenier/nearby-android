@@ -1,4 +1,4 @@
-package io.nearby.android.data
+package io.nearby.android.data.model
 
 import java.util.*
 

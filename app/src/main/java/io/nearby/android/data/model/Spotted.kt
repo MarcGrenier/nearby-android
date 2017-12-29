@@ -1,5 +1,7 @@
-package io.nearby.android.data
+package io.nearby.android.data.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import java.util.*
 
 /**
@@ -8,14 +10,20 @@ import java.util.*
 data class Spotted(
         val id: String,
         val message: String,
-        val location: Location) {
+        val location: Location) : Parcelable {
 
     var userId: String? = null
+
     var anonymity: Boolean = false
+
     var creationDate: Date? = null
+
     var thumbnailURL: String? = null
+
     var pictureURL: String? = null
+
     var fullName: String? = null
+
     var profilePictureURL: String? = null
 
     constructor(_id: String,
@@ -33,7 +41,23 @@ data class Spotted(
         }
     }
 
+    constructor(source: Parcel) : this(
+            source.readString(),
+            source.readString(),
+            source.readTypedObject(Location.CREATOR)
+    )
+
+    override fun describeContents() = 0
+
+    override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
+        writeString(id)
+        writeString(message)
+        writeParcelable(location, flags)
+    }
+
     companion object DummyFactory {
+        const val DEFAULT_ID = "0"
+
         fun create(): Spotted {
 
             val id = UUID.randomUUID().hashCode()
@@ -82,7 +106,7 @@ data class Spotted(
             var firstName = ""
             var lastName = ""
 
-            when (id % 10){
+            when (id % 10) {
                 0 -> firstName = "Marc"
                 1 -> firstName = "Mark"
                 2 -> firstName = "Christian"
@@ -95,7 +119,7 @@ data class Spotted(
                 9 -> firstName = "Tom"
             }
 
-            when ((id/10) % 10){
+            when ((id / 10) % 10) {
                 0 -> lastName = "Bloe"
                 1 -> lastName = "Smith"
                 2 -> lastName = "Cruise"
@@ -111,9 +135,15 @@ data class Spotted(
             return firstName + " " + lastName
         }
 
-        private fun getCreationDate(id: Int) : Date{
+        private fun getCreationDate(id: Int): Date {
             val random = Random(id.toLong())
             return Date(random.nextLong())
+        }
+
+        @JvmField
+        val CREATOR: Parcelable.Creator<Spotted> = object : Parcelable.Creator<Spotted> {
+            override fun createFromParcel(source: Parcel): Spotted = Spotted(source)
+            override fun newArray(size: Int): Array<Spotted?> = arrayOfNulls(size)
         }
     }
 }

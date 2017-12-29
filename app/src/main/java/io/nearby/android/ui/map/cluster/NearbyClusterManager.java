@@ -3,7 +3,6 @@ package io.nearby.android.ui.map.cluster;
 import android.content.Context;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
@@ -14,9 +13,6 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import io.nearby.android.R;
-import io.nearby.android.util.ImageUtil;
 
 /**
  * Created by Marc on 2017-01-31.
@@ -83,17 +79,15 @@ public class NearbyClusterManager<T extends ClusterItem> extends ClusterManager<
 
     public class MapIconRenderer<T extends ClusterItem> extends DefaultClusterRenderer<T> {
 
-        private Context mContext;
 
         public MapIconRenderer(Context context, GoogleMap map, ClusterManager<T> clusterManager) {
             super(context, map, clusterManager);
-            mContext = context;
         }
 
         @Override
         protected void onBeforeClusterItemRendered(T item, MarkerOptions markerOptions) {
             super.onBeforeClusterItemRendered(item, markerOptions);
-            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.circular_marker));
+            //markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.circular_marker));
         }
 
         @Override

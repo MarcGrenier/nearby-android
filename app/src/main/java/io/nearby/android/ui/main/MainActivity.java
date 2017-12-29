@@ -17,7 +17,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import io.nearby.android.R;
-import io.nearby.android.data.User;
+import io.nearby.android.data.model.User;
 import io.nearby.android.ui.BaseActivity;
 import io.nearby.android.ui.glide.CircleTransform;
 import io.nearby.android.ui.help.HelpActivity;

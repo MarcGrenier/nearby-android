@@ -1,34 +1,29 @@
 package io.nearby.android.ui.launcher;
 
-import io.nearby.android.data.source.DataManager;
-import io.nearby.android.data.source.SpottedDataSource;
+import io.nearby.android.data.manager.AuthenticationManager;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class LauncherPresenter implements LauncherContract.Presenter {
 
-    private LauncherContract.View mView;
+    private LauncherContract.View view;
 
     public LauncherPresenter(LauncherContract.View view) {
-        this.mView = view;
+        this.view = view;
     }
 
 
     @Override
     public void isUserLoggedIn() {
-        DataManager.getInstance().isUserLoggedIn(new SpottedDataSource.UserLoginStatusCallback() {
-            @Override
-            public void onError(SpottedDataSource.ErrorType errorType) {
-
+        AuthenticationManager.isUserLoggedIn()
+        .observeOn(AndroidSchedulers.mainThread())
+        .doOnNext(loginResult -> {
+            switch (loginResult.getStatus()){
+                case LOGGED_IN:
+                    view.onUserLoggedIn();
+                    break;
+                case NOT_LOGGED_IN:
+                    view.onUserLoggedIn();
             }
-
-            @Override
-            public void userIsLoggedIn() {
-                mView.onUserLoggedIn();
-            }
-
-            @Override
-            public void userIsNotLoggedIn() {
-                mView.onUserNotLoggedIn();
-            }
-        });
+        }).subscribe();
     }
 }
