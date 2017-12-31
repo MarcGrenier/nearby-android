@@ -17,6 +17,9 @@ import retrofit2.Response;
  */
 
 public class NearbyMockApi implements NearbyApi {
+
+    private List<Spotted> spotteds = new ArrayList<>();
+
     @Override
     public Observable<List<Spotted>> getMySpotteds() {
         List<Spotted> spotteds = new ArrayList<>();
@@ -49,17 +52,17 @@ public class NearbyMockApi implements NearbyApi {
 
     @Override
     public Observable<List<Spotted>> getSpotteds(double minLat, double maxLat, double minLng, double maxLng, boolean locationOnly) {
-        List<Spotted> spotteds = new ArrayList<>();
-
-        for (int i = 0; i < 20; i++) {
-            spotteds.add(Spotted.DummyFactory.create());
+        if(spotteds.isEmpty()){
+            for (int i = 0; i < 1000; i++) {
+                spotteds.add(Spotted.DummyFactory.create());
+            }
         }
         return Observable.just(spotteds);
     }
 
     @Override
     public Observable<Spotted> getSpotted(String spottedId) {
-        return Observable.just(Spotted.DummyFactory.create());
+        return Observable.just(Spotted.DummyFactory.create(Integer.parseInt(spottedId)));
     }
 
     @Override

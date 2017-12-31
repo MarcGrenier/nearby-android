@@ -128,12 +128,9 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
 
         getChildFragmentManager().beginTransaction().replace(R.id.support_map_fragment, mMapFragment).commit();
 
-        view.findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), NewSpottedActivity.class);
-                startActivity(intent);
-            }
+        view.findViewById(R.id.fab).setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), NewSpottedActivity.class);
+            startActivity(intent);
         });
         return view;
     }
@@ -290,6 +287,8 @@ public class MapFragment extends BaseFragment<MapContract.Presenter> implements 
             SpottedClusterItem item = new SpottedClusterItem(spotted);
             mClusterManager.addItem(item);
         }
+
+        mClusterManager.cluster();
     }
 
     private void updateLocationUI() {

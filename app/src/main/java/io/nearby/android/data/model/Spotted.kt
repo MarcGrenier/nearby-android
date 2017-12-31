@@ -60,8 +60,14 @@ data class Spotted(
 
         fun create(): Spotted {
 
-            val id = UUID.randomUUID().hashCode()
-            val userId = (UUID.randomUUID().hashCode() % 100).toString()
+            var id = UUID.randomUUID().hashCode()
+            if (id < 0) id *= -1
+
+            return create(id)
+        }
+
+        fun create(id: Int): Spotted {
+            val userId = (id % 100).toString()
             val message = getMessage(id)
             val location = getLocation(id)
             val anonymity = getAnonymity(id)
@@ -70,6 +76,12 @@ data class Spotted(
             spotted.userId = userId
             spotted.fullName = getFullName(id)
             spotted.creationDate = getCreationDate(id)
+            spotted.profilePictureURL = "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg"
+
+            if(id%2 == 0){
+                spotted.pictureURL = "https://images.pexels.com/photos/20974/pexels-photo.jpg"
+                spotted.thumbnailURL= "https://images.pexels.com/photos/6639/building-historical-columns.jpg"
+            }
 
             return spotted
         }
